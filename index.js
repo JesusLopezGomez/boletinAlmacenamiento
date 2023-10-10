@@ -49,19 +49,73 @@ let lista = document.getElementById("userList");
 let nombre = document.getElementById("name");
 let direccion = document.getElementById("address");
 let email = document.getElementById("email");
-let enviar = document.querySelector("button");
+let enviar = document.querySelector("button[type='submit']");
+//localStorage.removeItem("Users");
 
-if(localStorage.getItem("cont") == null){
-    localStorage.setItem("cont",0)
+function comprobarRepetidos(usuario) {
+    let hijosLista = lista.getElementsByTagName("li");
+    let unico = true;
+    for(let o = 0; o < hijosLista.length; o++) {
+        let datosHijo = Array.from(hijosLista[o].textContent.split(":"));
+        if(datosHijo[0].trim() == usuario.nombre && datosHijo[1].trim() == usuario.direccion && datosHijo[2].trim() == usuario.email){
+            unico = false;
+        }
+    }
+    return unico
 }
-enviar.addEventListener(`click`,function(){
 
-    if(nombre.value != "" && direccion.value != "" && email.value != ""){
-        localStorage.setItem("cont", parseInt(localStorage.getItem("cont"))+1);
-        let li = document.createElement("li").appendChild(document.createTextNode(JSON.stringify({nombre:nombre.value,direccion:direccion.value,email:email.value})));
-        lista.appendChild(li);
-        document.body.appendChild(lista);
-        localStorage.setItem(localStorage.getItem("cont"),[JSON.stringify({nombre:nombre.value,direccion:direccion.value,email:email.value})]);
+function mostrarUsuarios(usuarios){
+    if(usuarios != null && usuarios.length > 0){
+        let usuariosSeparados = usuarios.split("|");
+        usuariosSeparados.forEach(elemento => {
+            let usuario = JSON.parse(elemento);
+            if(comprobarRepetidos(usuario)){
+                let li = document.createElement("li");
+                li.appendChild(document.createTextNode(`${usuario.nombre} : ${usuario.direccion} : ${usuario.email} : `));
+
+                let editar = document.createElement("button");
+                editar.textContent = "Editar";
+                editar.setAttribute("id","editar");
+                li.appendChild(editar);
+
+                let br = document.createElement("br");
+                li.appendChild(br);
+
+                let borrar = document.createElement("button");
+                borrar.textContent = "Borrar";
+                borrar.setAttribute("id","borrar");
+                li.appendChild(borrar);
+
+                lista.appendChild(li);
+                document.body.appendChild(lista);
+            }
+        });
+    }
+}
+
+enviar.addEventListener(`click`,function(){
+    if(nombre.value != "" && direccion.value != "" && email.value != ""){    
+        let usuario = {nombre:nombre.value,direccion:direccion.value,email:email.value};
+        if(comprobarRepetidos(usuario)){
+            if(localStorage.getItem("Users") == null || localStorage.getItem("Users").length == 0){
+                localStorage.setItem("Users",[JSON.stringify(usuario)].join("|"));
+            }else{
+                let array = Array.from(localStorage.getItem("Users").split("|"));
+                array.push(JSON.stringify(usuario));
+                localStorage.setItem("Users",array.join("|"));
+            }
+        }
     }
 });
 
+mostrarUsuarios(localStorage.getItem("Users"));
+
+let borrar = document.querySelectorAll("#borrar");
+for(let i = 0; i < borrar.length; i++){
+    borrar[i].addEventListener(`click`,function(event){ 
+        event.target.parentNode.remove();
+        let usuarios = Array.from(localStorage.getItem("Users").split("|"));
+        usuarios.splice(i,1);
+        localStorage.setItem("Users",usuarios.join("|"));
+    });
+};
