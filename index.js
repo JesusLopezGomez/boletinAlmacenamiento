@@ -44,79 +44,78 @@ localStorage.setItem("locotron","123");
 localStorage.removeItem("locotron");
 
 //Ejercicio 6
-let lista = document.getElementById("userList");
+let lista = document.getElementById("userList"); //Recupero la lista <ul>
 
-let nombre = document.getElementById("name");
-let direccion = document.getElementById("address");
-let email = document.getElementById("email");
-let enviar = document.querySelector("button[type='submit']");
+let nombre = document.getElementById("name"); //Recupero el input que tiene de id name
+let direccion = document.getElementById("address"); //Recupero el input que tiene de id direccion
+let email = document.getElementById("email"); //Recupero el input que tiene de id email
+let enviar = document.querySelector("button[type='submit']"); //Recupero el boton de tipo submit
 
-let usuarios = localStorage.getItem("users") == null ? [] :JSON.parse(localStorage.getItem("users"));
-let copiaUsuariosString = localStorage.getItem("users") == null ? [] : localStorage.getItem("users");
+let usuarios = localStorage.getItem("users") == null ? [] :JSON.parse(localStorage.getItem("users")); //Si el localStorage de users es nulol le asigno un array vacío y si no le asigno lo que tenga el localStorage pero lo paso a JSON
+let copiaUsuariosString = localStorage.getItem("users") == null ? [] : localStorage.getItem("users"); //Lo mismo pero sin pasarlo a JSON,si es diferente de nulo lo guardo en String
 
 
-enviar.addEventListener(`click`,function(){
-    if(nombre.value != "" && direccion.value != "" && email.value != ""){
-        let usuario = {nombre:nombre.value, direccion:direccion.value, email:email.value};
-        if(usuarioUnico(usuario)){
-            usuarios.push(usuario);
-            localStorage.setItem("users",JSON.stringify(usuarios));    
+enviar.addEventListener(`click`,function(){ //Cuando le de a enviar
+    if(nombre.value != "" && direccion.value != "" && email.value != ""){ //Compruebo que ningun campo está vacío
+        let usuario = {nombre:nombre.value, direccion:direccion.value, email:email.value}; //Creo un objeto usuario con los datos de los input
+        if(usuarioUnico(usuario)){ //Compruebo que es único, es decir que no hay otro igual.
+            usuarios.push(usuario); //Le añado el usuario a la array creada anteriomente
+            localStorage.setItem("users",JSON.stringify(usuarios)); //Al la key users le asigno el valor del array de objeto pero pasando los JSON a string
         }
     }
 });
 
-function mostrarUsuarios(){
-    usuarios.forEach(usuario => {
-        let li = document.createElement("li");        
-        li.appendChild(document.createTextNode(`${usuario.nombre} : ${usuario.direccion} : ${usuario.email} : `));
+function mostrarUsuarios(){ 
+    usuarios.forEach(usuario => { //Recorro el array de usuarios
+        let li = document.createElement("li"); //Cada vez que lo recorro creo un elemento LI  
+        li.appendChild(document.createTextNode(`${usuario.nombre} : ${usuario.direccion} : ${usuario.email} : `)); //Le paso al LI un texto que será la información del usuario en el siguiente fomrato nombre : direccion : correo : 
 
-        let editar = document.createElement("button");
-        editar.textContent = "Editar";
-        editar.setAttribute("id","mod");
+        let editar = document.createElement("button"); //Creo un botón de editar cada vez que se recorra
+        editar.textContent = "Editar"; //Le pongo en el textContent lo que quiero que me salga en el botón de editar
+        editar.setAttribute("id","mod"); //Le pongo id al botón de editar para después utilizarlo más abajo
 
-        let br = document.createElement("br");
+        let br = document.createElement("br"); //Creo un elemento br para que le de un salto de línea y quede más bonito
 
-        let borrar = document.createElement("button");
-        borrar.textContent = "Borrar";
-        borrar.setAttribute("id","del");
+        let borrar = document.createElement("button"); //Creo un botón de borro cada vez que se recorra
+        borrar.textContent = "Borrar"; //Le pongo en el textContent lo que quiero que me salga en el botón de borrar
+        borrar.setAttribute("id","del"); //Le pongo id al botón de borrar para después utilizarlo más abajo
 
-        li.appendChild(editar);
-        li.appendChild(br);
-        li.appendChild(borrar);
-        lista.appendChild(li);
+        li.appendChild(editar); //Le añado al li el botón de editar
+        li.appendChild(br); //Le añado al li el salto de línea
+        li.appendChild(borrar); //Le añado al li el botón de borrar
+        lista.appendChild(li); //Y por último a la lista de añado el li para que se muestre por pantalla todo lo que hemos añadido anteriormente
     });
 }
 
-function usuarioUnico(usuario){
+function usuarioUnico(usuario){ //Esta función me comprueba si hay algun usuario como el que le pasamos por parametro
     let unico = true;
-    if(copiaUsuariosString.indexOf(JSON.stringify(usuario)) != -1){
-        unico = false;
-    }
+    if(copiaUsuariosString.indexOf(JSON.stringify(usuario)) != -1)unico = false;
+    /*Inicializo en true unico de forma en que si hay un usuario igual que él, el indexOf me dará algo diferente a -1 y le asigno a unico false*/
     return unico;
 }
 
-mostrarUsuarios();
+mostrarUsuarios(); //Muestro todos los usuarios
 
-let borrar = document.querySelectorAll("#del");
-for(let i = 0; i < borrar.length; i++){
-    borrar[i].addEventListener(`click`,function(event){ 
-        event.target.parentNode.remove();
-        usuarios.splice(i,1);
-        localStorage.setItem("users",JSON.stringify(usuarios));
+let borrar = document.querySelectorAll("#del"); //Recupero todos los botones con el id del en una array
+for(let i = 0; i < borrar.length; i++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
+    borrar[i].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array, tengo también el event para acceder al padre de un elemento más fácil
+        event.target.parentNode.remove(); //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
+        usuarios.splice(i,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
+        localStorage.setItem("users",JSON.stringify(usuarios)); //Le reemplazo el valor a users esta vez sin el usuario que hemos eliminado
     });
 }
 
-let editar = document.querySelectorAll("#mod");
-for(let o = 0; o < editar.length ; o++){
-    editar[o].addEventListener(`click`,function(event){
-        let usuarioRecuperado = usuarios[o];
-        event.target.parentNode.remove();
-        //falta borra de la lista
-        nombre.value = usuarioRecuperado.nombre;
-        direccion.value = usuarioRecuperado.direccion;
-        email.value = usuarioRecuperado.email;
-        enviar.textContent = "Editar usuario";
+let editar = document.querySelectorAll("#mod"); //Recupero todos los botones con el id mod en una array
+for(let o = 0; o < editar.length ; o++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
+    editar[o].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array,tengo también el event para acceder al padre de un elemento más fácil
+    let usuarioRecuperado = usuarios[o]; //Me guardo el usuario que vamos a borrar en esta variable para despues usarlo
+    event.target.parentNode.remove();  //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
+    usuarios.splice(o,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
+
+    nombre.value = usuarioRecuperado.nombre; //Al input de nombre le asigno el valor del usuario borrado
+    direccion.value = usuarioRecuperado.direccion; //Al input de direccion le asigno el valor del usuario borrado
+    email.value = usuarioRecuperado.email; //Al input de email le asigno el valor del usuario borrado
+
+    enviar.textContent = "Editar usuario"; //Cambio el textContent del botón de enviar a Editar usuario y cuando le de a editar ejecutará el escuchador de eventos de arriba y añadirá la nueva informacion del usuario correctamente tanto el la lista como en el localStorage
     })
 }
-
-//localStorage.removeItem("users");
