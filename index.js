@@ -50,72 +50,73 @@ let nombre = document.getElementById("name");
 let direccion = document.getElementById("address");
 let email = document.getElementById("email");
 let enviar = document.querySelector("button[type='submit']");
-//localStorage.removeItem("Users");
 
-function comprobarRepetidos(usuario) {
-    let hijosLista = lista.getElementsByTagName("li");
-    let unico = true;
-    for(let o = 0; o < hijosLista.length; o++) {
-        let datosHijo = Array.from(hijosLista[o].textContent.split(":"));
-        if(datosHijo[0].trim() == usuario.nombre && datosHijo[1].trim() == usuario.direccion && datosHijo[2].trim() == usuario.email){
-            unico = false;
-        }
-    }
-    return unico
-}
+let usuarios = localStorage.getItem("users") == null ? [] :JSON.parse(localStorage.getItem("users"));
+let copiaUsuariosString = localStorage.getItem("users") == null ? [] : localStorage.getItem("users");
 
-function mostrarUsuarios(usuarios){
-    if(usuarios != null && usuarios.length > 0){
-        let usuariosSeparados = usuarios.split("|");
-        usuariosSeparados.forEach(elemento => {
-            let usuario = JSON.parse(elemento);
-            if(comprobarRepetidos(usuario)){
-                let li = document.createElement("li");
-                li.appendChild(document.createTextNode(`${usuario.nombre} : ${usuario.direccion} : ${usuario.email} : `));
-
-                let editar = document.createElement("button");
-                editar.textContent = "Editar";
-                editar.setAttribute("id","editar");
-                li.appendChild(editar);
-
-                let br = document.createElement("br");
-                li.appendChild(br);
-
-                let borrar = document.createElement("button");
-                borrar.textContent = "Borrar";
-                borrar.setAttribute("id","borrar");
-                li.appendChild(borrar);
-
-                lista.appendChild(li);
-                document.body.appendChild(lista);
-            }
-        });
-    }
-}
 
 enviar.addEventListener(`click`,function(){
-    if(nombre.value != "" && direccion.value != "" && email.value != ""){    
-        let usuario = {nombre:nombre.value,direccion:direccion.value,email:email.value};
-        if(comprobarRepetidos(usuario)){
-            if(localStorage.getItem("Users") == null || localStorage.getItem("Users").length == 0){
-                localStorage.setItem("Users",[JSON.stringify(usuario)].join("|"));
-            }else{
-                let array = Array.from(localStorage.getItem("Users").split("|"));
-                array.push(JSON.stringify(usuario));
-                localStorage.setItem("Users",array.join("|"));
-            }
+    if(nombre.value != "" && direccion.value != "" && email.value != ""){
+        let usuario = {nombre:nombre.value, direccion:direccion.value, email:email.value};
+        if(usuarioUnico(usuario)){
+            usuarios.push(usuario);
+            localStorage.setItem("users",JSON.stringify(usuarios));    
         }
     }
 });
 
-mostrarUsuarios(localStorage.getItem("Users"));
+function mostrarUsuarios(){
+    usuarios.forEach(usuario => {
+        let li = document.createElement("li");        
+        li.appendChild(document.createTextNode(`${usuario.nombre} : ${usuario.direccion} : ${usuario.email} : `));
 
-let borrar = document.querySelectorAll("#borrar");
+        let editar = document.createElement("button");
+        editar.textContent = "Editar";
+        editar.setAttribute("id","mod");
+
+        let br = document.createElement("br");
+
+        let borrar = document.createElement("button");
+        borrar.textContent = "Borrar";
+        borrar.setAttribute("id","del");
+
+        li.appendChild(editar);
+        li.appendChild(br);
+        li.appendChild(borrar);
+        lista.appendChild(li);
+    });
+}
+
+function usuarioUnico(usuario){
+    let unico = true;
+    if(copiaUsuariosString.indexOf(JSON.stringify(usuario)) != -1){
+        unico = false;
+    }
+    return unico;
+}
+
+mostrarUsuarios();
+
+let borrar = document.querySelectorAll("#del");
 for(let i = 0; i < borrar.length; i++){
     borrar[i].addEventListener(`click`,function(event){ 
         event.target.parentNode.remove();
-        let usuarios = Array.from(localStorage.getItem("Users").split("|"));
         usuarios.splice(i,1);
-        localStorage.setItem("Users",usuarios.join("|"));
+        localStorage.setItem("users",JSON.stringify(usuarios));
     });
-};
+}
+
+let editar = document.querySelectorAll("#mod");
+for(let o = 0; o < editar.length ; o++){
+    editar[o].addEventListener(`click`,function(event){
+        let usuarioRecuperado = usuarios[o];
+        event.target.parentNode.remove();
+        //falta borra de la lista
+        nombre.value = usuarioRecuperado.nombre;
+        direccion.value = usuarioRecuperado.direccion;
+        email.value = usuarioRecuperado.email;
+        enviar.textContent = "Editar usuario";
+    })
+}
+
+//localStorage.removeItem("users");
