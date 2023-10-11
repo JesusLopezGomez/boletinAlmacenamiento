@@ -89,7 +89,7 @@ function mostrarUsuarios(){
 
 function usuarioUnico(usuario){ //Esta función me comprueba si hay algun usuario como el que le pasamos por parametro
     let unico = true;
-    if(copiaUsuariosString.indexOf(JSON.stringify(usuario)) != -1)unico = false;
+    if(copiaUsuariosString.indexOf(JSON.stringify(usuario)) != -1) unico = false;
     /*Inicializo en true unico de forma en que si hay un usuario igual que él, el indexOf me dará algo diferente a -1 y le asigno a unico false*/
     return unico;
 }
