@@ -94,28 +94,35 @@ function usuarioUnico(usuario){ //Esta función me comprueba si hay algun usuari
     return unico;
 }
 
-mostrarUsuarios(); //Muestro todos los usuarios
+mostrarUsuarios();
+borrar();
+modificar();
 
-let borrar = document.querySelectorAll("#del"); //Recupero todos los botones con el id del en una array
-for(let i = 0; i < borrar.length; i++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
-    borrar[i].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array, tengo también el event para acceder al padre de un elemento más fácil
-        event.target.parentNode.remove(); //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
-        usuarios.splice(i,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
-        localStorage.setItem("users",JSON.stringify(usuarios)); //Le reemplazo el valor a users esta vez sin el usuario que hemos eliminado
-    });
+function borrar(){
+    let borrar = document.querySelectorAll("#del"); //Recupero todos los botones con el id del en una array
+    for(let i = 0; i < borrar.length; i++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
+        borrar[i].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array, tengo también el event para acceder al padre de un elemento más fácil
+            event.target.parentNode.remove(); //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
+            usuarios.splice(i,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
+            localStorage.setItem("users",JSON.stringify(usuarios)); //Le reemplazo el valor a users esta vez sin el usuario que hemos eliminado
+        });
+    }
 }
 
-let editar = document.querySelectorAll("#mod"); //Recupero todos los botones con el id mod en una array
-for(let o = 0; o < editar.length ; o++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
-    editar[o].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array,tengo también el event para acceder al padre de un elemento más fácil
-    let usuarioRecuperado = usuarios[o]; //Me guardo el usuario que vamos a borrar en esta variable para despues usarlo
-    event.target.parentNode.remove();  //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
-    usuarios.splice(o,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
-
-    nombre.value = usuarioRecuperado.nombre; //Al input de nombre le asigno el valor del usuario borrado
-    direccion.value = usuarioRecuperado.direccion; //Al input de direccion le asigno el valor del usuario borrado
-    email.value = usuarioRecuperado.email; //Al input de email le asigno el valor del usuario borrado
-
-    enviar.textContent = "Editar usuario"; //Cambio el textContent del botón de enviar a Editar usuario y cuando le de a editar ejecutará el escuchador de eventos de arriba y añadirá la nueva informacion del usuario correctamente tanto el la lista como en el localStorage
-    })
+function modificar(){
+    let editar = document.querySelectorAll("#mod"); //Recupero todos los botones con el id mod en una array
+    for(let o = 0; o < editar.length ; o++){ //Recorro la array de los botones con un for tradicional ya que necesito su indice
+        editar[o].addEventListener(`click`,function(event){ //Cuando clicke en algunos de los botones que tenemos en el array,tengo también el event para acceder al padre de un elemento más fácil
+        let usuarioRecuperado = usuarios[o]; //Me guardo el usuario que vamos a borrar en esta variable para despues usarlo
+        event.target.parentNode.remove();  //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
+        usuarios.splice(o,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
+    
+        nombre.value = usuarioRecuperado.nombre; //Al input de nombre le asigno el valor del usuario borrado
+        direccion.value = usuarioRecuperado.direccion; //Al input de direccion le asigno el valor del usuario borrado
+        email.value = usuarioRecuperado.email; //Al input de email le asigno el valor del usuario borrado
+    
+        enviar.textContent = "Editar usuario"; //Cambio el textContent del botón de enviar a Editar usuario y cuando le de a editar ejecutará el escuchador de eventos de arriba y añadirá la nueva informacion del usuario correctamente tanto el la lista como en el localStorage
+        })
+    }
 }
+
