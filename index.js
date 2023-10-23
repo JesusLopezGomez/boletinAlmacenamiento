@@ -61,6 +61,36 @@ enviar.addEventListener(`click`,function(){ //Cuando le de a enviar
         if(usuarioUnico(usuario)){ //Compruebo que es único, es decir que no hay otro igual.
             usuarios.push(usuario); //Le añado el usuario a la array creada anteriomente
             localStorage.setItem("users",JSON.stringify(usuarios)); //Al la key users le asigno el valor del array de objeto pero pasando los JSON a string
+            
+            const persona = {
+                nombre: nombre.value,
+                direccion : direccion.value,
+                email : email.value
+            }
+            const peticion = new XMLHttpRequest();
+            peticion.open("POST","http://localhost:3000/users");
+            peticion.setRequestHeader("Content-type", "application/json");
+            peticion.send(JSON.stringify(persona));
+            
+            peticion.addEventListener('load', function() {
+                if (peticion.status===201) { //Pongo el 201 porque es el código de error que nos dice si se ha creado el post
+                    let usuarios=JSON.parse(peticion.responseText);  // Convertirmos los datos JSON a un objeto
+                } else {
+                    muestraError();
+                }
+            })
+            
+            peticion.addEventListener('error', muestraError);
+            peticion.addEventListener('abort', muestraError);
+            peticion.addEventListener('timeout', muestraError);
+            
+            function muestraError() {
+                if (this.status) {
+                    console.log("Error "+this.status+" ("+this.statusText+") en la petición");
+                } else {
+                    console.log("Ocurrió un error o se abortó la conexión");
+                }
+            }
         }
     }
 });
@@ -73,12 +103,29 @@ function mostrarUsuarios(){
         let editar = document.createElement("button"); //Creo un botón de editar cada vez que se recorra
         editar.textContent = "Editar"; //Le pongo en el textContent lo que quiero que me salga en el botón de editar
         editar.setAttribute("id","mod"); //Le pongo id al botón de editar para después utilizarlo más abajo
-
+        
         let br = document.createElement("br"); //Creo un elemento br para que le de un salto de línea y quede más bonito
 
         let borrar = document.createElement("button"); //Creo un botón de borro cada vez que se recorra
         borrar.textContent = "Borrar"; //Le pongo en el textContent lo que quiero que me salga en el botón de borrar
         borrar.setAttribute("id","del"); //Le pongo id al botón de borrar para después utilizarlo más abajo
+        
+        /*Esto es para darle una clase al boton*/
+        const data = null;
+
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        
+        xhr.addEventListener("readystatechange", function () {
+          if (this.readyState === this.DONE) {
+            borrar.setAttribute("class",JSON.parse(this.responseText)[0].id);
+          }
+        });
+        
+        xhr.open("GET", `http://localhost:3000/users?nombre=${usuario.nombre}`);
+        xhr.setRequestHeader("Accept", "application/json");
+        
+        xhr.send(data);
 
         li.appendChild(editar); //Le añado al li el botón de editar
         li.appendChild(br); //Le añado al li el salto de línea
@@ -105,6 +152,22 @@ function borrar(){
             event.target.parentNode.remove(); //Esto me elimina el padre del botón el cual le ha dado click y en este caso me borrará el li correspondiente
             usuarios.splice(i,1); //Borra en la array la posicón donde esta el usuario que quería borrar, con el splice que me borrará 1 desde la posición que le he añadido en este caso al "i"
             localStorage.setItem("users",JSON.stringify(usuarios)); //Le reemplazo el valor a users esta vez sin el usuario que hemos eliminado
+            
+            const data = JSON.stringify({});
+
+            const xhr = new XMLHttpRequest();
+            xhr.withCredentials = true;
+
+            xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === this.DONE) {
+                console.log(this.responseText);
+            }
+            });
+
+            xhr.open("DELETE", `http://localhost:3000/users/${borrar[i].classList.value}`);
+            xhr.setRequestHeader("Accept", "application/json");
+
+            xhr.send(data);
         });
     }
 }
@@ -121,8 +184,10 @@ function modificar(){
         direccion.value = usuarioRecuperado.direccion; //Al input de direccion le asigno el valor del usuario borrado
         email.value = usuarioRecuperado.email; //Al input de email le asigno el valor del usuario borrado
     
-        enviar.textContent = "Editar usuario"; //Cambio el textContent del botón de enviar a Editar usuario y cuando le de a editar ejecutará el escuchador de eventos de arriba y añadirá la nueva informacion del usuario correctamente tanto el la lista como en el localStorage
+        enviar.textContent = "Editar usuario"; //Cambio el textContent del botón de enviar a Editar usuario y cuando le de a editar ejecutará el escuchador de eventos de arriba y añadirá la nueva informacion del usuario correctamente tanto el la lista como en el localStorage        
+
         })
     }
 }
+
 
