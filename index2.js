@@ -14,9 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         peticion.addEventListener("load",function(){
             if(peticion.status == 200){
-                let usersData = JSON.parse(peticion.responseText);
+                usersData = JSON.parse(peticion.responseText);
                 usersData.forEach((user) => {
-                    addUserToList(user.nombre,user.direccion,user.email,user.id);
+                    addUserToList(user.name,user.address,user.email,user.id);
                 })
             }
         })
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         peticion.addEventListener("load",function(){
             if(peticion.status == 201){
                     let newUser = JSON.parse(peticion.responseText);
-                    addUserToList(newUser.nombre,newUser.direccion,newUser.email,newUser.id);
+                    addUserToList(newUser.name,newUser.address,newUser.email,newUser.id);
                 }
             });
         peticion.send(JSON.stringify(user));
@@ -42,6 +42,19 @@ document.addEventListener("DOMContentLoaded", function () {
         peticion.open('DELETE',urlApi + "/" + id);
         peticion.setRequestHeader('Content-type', 'application/json');
         peticion.send();
+    }
+    
+    function replaceUserApi(id,user){
+        const peticion = new XMLHttpRequest();
+        peticion.withCredentials = true;
+        peticion.open('PUT',urlApi + "/" + id);
+        peticion.setRequestHeader('Content-type', 'application/json');
+        peticion.addEventListener("load",function(){
+            if(peticion.status == 200){
+                console.log("200OK")
+            }
+        });
+        peticion.send(JSON.stringify(user));
     }
     
     getUsersApi();
@@ -104,14 +117,13 @@ document.addEventListener("DOMContentLoaded", function () {
             userForm.elements.email.value = email;
             userForm.dataset.editing = email;
             userForm.querySelector("button[type='submit']").textContent = "Editar Usuario";
-            //userForm.dataset.editingListItem = listItem; // Almacena el elemento de lista a editar
+            userForm.dataset.editingListItem = listItem; // Almacena el elemento de lista a editar
             userForm.dataset.editingIndex = [...userList.children].indexOf(listItem); // Almacena el índice del elemento en la lista
         }
     }
 
     // Manejar el envío del formulario (Agregar o Editar usuario)
     userForm.addEventListener("submit", function (event) {
-        event.preventDefault();
         const name = userForm.elements.name.value;
         const address = userForm.elements.address.value;
         const email = userForm.elements.email.value;
@@ -125,12 +137,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         user.name = name;
                         user.address = address;
                         user.email = email;
+                        replaceUserApi(user.id,{name,address,email});
                     }
                     return user;
                 });
 
                 // Reemplaza el elemento existente en el índice con el nuevo elemento
-
                 userList.replaceChild(listItem, userList.children[editingIndex]);
                 userForm.removeAttribute("data-editing");
                 userForm.querySelector("button[type='submit']").textContent = "Agregar Usuario";
@@ -140,10 +152,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (usersData.some(user => user.email === email)) {
                     alert('El email especificado ya existe en la lista');
                     return;
+                }else{
+                    usersData.push({name,address,email});
+                    const user = {name, address, email}
+                    addUserApi(user);
                 }
+
             }
-            const user = {"nombre":name, "direccion":address, "email":email}
-            addUserApi(user);
             userForm.reset();
         } else {
             alert('Alguno de los campos no es correcto');
@@ -156,5 +171,4 @@ document.addEventListener("DOMContentLoaded", function () {
         editUser(event);
     });
 
-    // Cargar usuarios almacenados en localStorage al cargar la página
 });

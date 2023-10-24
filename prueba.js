@@ -1,15 +1,26 @@
-const data = null;
+const request = require("request");
+const process = require('process');
+const fs = require('fs');
+const { json } = require('stream/consumers');
 
-const xhr = new XMLHttpRequest();
-xhr.withCredentials = true;
+const options = {
+  method: 'GET',
+  url: 'https://icanhazdadjoke.com//search',
+  headers: {Accept: 'application/json'},
+  qs : {term : process.argv[2]}
+};
 
-xhr.addEventListener("readystatechange", function () {
-  if (this.readyState === this.DONE) {
-    console.log(JSON.parse(this.responseText)[0]);
-  }
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  const chistes = JSON.parse(body).results;
+    for(chistecito in chistes){
+    console.log(chistes[chistecito].joke)
+   /* fs.appendFile('loc.txt',JSON.stringify(chistecito),(err) => {
+        if(err){
+            console.log(err)
+        }
+    })}*/
+
+    }
 });
-
-xhr.open("GET", "http://localhost:3000/users?nombre=yeray");
-xhr.setRequestHeader("Accept", "application/json");
-
-xhr.send(data);
