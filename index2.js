@@ -1,7 +1,50 @@
 document.addEventListener("DOMContentLoaded", function () {
     const userForm = document.getElementById("userForm");
     const userList = document.getElementById("userList");
-    let usersData = JSON.parse(localStorage.getItem("usersData")) || [];
+    let usersData = [];
+    const urlApi = "http://localhost:3000/users";
+    
+
+    function getUsersApi(){
+        const peticion = new XMLHttpRequest();
+
+        peticion.open('GET',urlApi);
+        peticion.setRequestHeader('Content-type', 'application/json');
+        peticion.send();
+
+        peticion.addEventListener("load",function(){
+            if(peticion.status == 200){
+                let usersData = JSON.parse(peticion.responseText);
+                usersData.forEach((user) => {
+                    addUserToList(user.nombre,user.direccion,user.email,user.id);
+                })
+            }
+        })
+    }
+
+    function addUserApi(user){
+        const peticion = new XMLHttpRequest();
+        peticion.withCredentials = true;
+        peticion.open('POST',urlApi);
+        peticion.setRequestHeader("Content-type", "application/json");
+        peticion.addEventListener("load",function(){
+            if(peticion.status == 201){
+                    let newUser = JSON.parse(peticion.responseText);
+                    addUserToList(newUser.nombre,newUser.direccion,newUser.email,newUser.id);
+                }
+            });
+        peticion.send(JSON.stringify(user));
+
+    }
+
+    function deleteUserApi(id){
+        const peticion = new XMLHttpRequest();
+        peticion.open('DELETE',urlApi + "/" + id);
+        peticion.setRequestHeader('Content-type', 'application/json');
+        peticion.send();
+    }
+    
+    getUsersApi();
 
     // Función para validar email
     function validateEmail(email) {
@@ -10,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Función para crear el nuevo item de la lista
-    function createListItem(name, address, email) {
+    function createListItem(name, address, email,id) {
        
         // Crea nuevos elementos
         const listItem = document.createElement("li");
@@ -18,71 +61,33 @@ document.addEventListener("DOMContentLoaded", function () {
         const editButton = document.createElement("button");
         const deleteButton = document.createElement("button");
 
-                       /*Esto es para darle una clase al boton*/
-                       const data = null;
-
-                       const xhr = new XMLHttpRequest();
-                       xhr.withCredentials = true;
-                       
-                       xhr.addEventListener("readystatechange", function () {
-                           if (this.readyState === this.DONE) {
-                               deleteButton.setAttribute("id",JSON.parse(this.responseText)[0].id);
-                               editButton.setAttribute("id",JSON.parse(this.responseText)[0].id);
-                           }
-                       });
-                       
-                       xhr.open("GET", `http://localhost:3000/users?nombre=${name}`);
-                       xhr.setRequestHeader("Accept", "application/json");
-                       
-                       xhr.send(data);
-
         // Establece atributos y contenido para los botones
         editButton.classList.add("edit");
         deleteButton.classList.add("delete");
         editButton.textContent = "Editar";
         deleteButton.textContent = "Borrar";
-
+        
+        deleteButton.setAttribute("data-id",id);
+        editButton.setAttribute("data-id",id);
         // Agrega los elementos al elemento <li>
         listItem.appendChild(userInfo);
         listItem.appendChild(editButton);
         listItem.appendChild(deleteButton);
 
-
-
     return listItem;
   }
 
     // Función para agregar un usuario a la lista
-    function addUserToList(name, address, email) {
-        const listItem = createListItem(name, address, email);
+    function addUserToList(name, address, email,id) {
+        const listItem = createListItem(name, address, email,id);
         userList.appendChild(listItem);
     }
-document.getElementsByClassName
     // Función para borrar un usuario de la lista y del localStorage
     function deleteUser(event) {
         if (event.target.classList.contains("delete")) {
             const listItem = event.target.parentElement;
-            const email = listItem.textContent.split(" : ")[2];
-            usersData = usersData.filter(user => user.email !== email);
-            localStorage.setItem("usersData", JSON.stringify(usersData));
-
+            deleteUserApi(listItem.getElementsByClassName("delete")[0].dataset.id);
             listItem.remove();
-
-            const data = JSON.stringify({});
-
-            const xhr = new XMLHttpRequest();
-            xhr.withCredentials = true;
-
-            xhr.addEventListener("readystatechange", function () {
-            if (this.readyState === this.DONE) {
-                console.log(this.responseText);
-            }
-            });
-
-            xhr.open("DELETE", `http://localhost:3000/users/${listItem.getElementsByClassName("delete")[0].id}`);
-            xhr.setRequestHeader("Accept", "application/json");
-
-            xhr.send(data);
         }
     }
 
@@ -112,37 +117,8 @@ document.getElementsByClassName
         const email = userForm.elements.email.value;
         const editingIndex = parseInt(userForm.dataset.editingIndex);
         if (name && address && validateEmail(email)) {
-            const listItem = createListItem(name, address, email)
-
-            const persona = {
-                nombre: name,
-                direccion : address,
-                email : email
-            }
-            const peticion = new XMLHttpRequest();
-            peticion.open("POST","http://localhost:3000/users");
-            peticion.setRequestHeader("Content-type", "application/json");
-            peticion.send(JSON.stringify(persona));
-            
-            peticion.addEventListener('load', function() {
-                if (peticion.status!=201) { //Pongo el 201 porque es el código de error que nos dice si se ha creado el post
-                    muestraError();
-                }
-            })
-            
-            peticion.addEventListener('error', muestraError);
-            peticion.addEventListener('abort', muestraError);
-            peticion.addEventListener('timeout', muestraError);
-            
-            function muestraError() {
-                if (this.status) {
-                    console.log("Error "+this.status+" ("+this.statusText+") en la petición");
-                } else {
-                    console.log("Ocurrió un error o se abortó la conexión");
-                }
-            }
-
-            if (userForm.dataset.editing) {
+            const listItem = createListItem(name, address, email);
+            if(userForm.dataset.editing) {
                 const emailToEdit = userForm.dataset.editing;
                 usersData = usersData.map(user => {
                     if (user.email === emailToEdit) {
@@ -160,14 +136,14 @@ document.getElementsByClassName
                 userForm.querySelector("button[type='submit']").textContent = "Agregar Usuario";
                 
             } else {
+                if(usersData)
                 if (usersData.some(user => user.email === email)) {
                     alert('El email especificado ya existe en la lista');
                     return;
                 }
-                usersData.push({ name, address, email });
-                addUserToList(name, address, email);
             }
-            localStorage.setItem("usersData", JSON.stringify(usersData));
+            const user = {"nombre":name, "direccion":address, "email":email}
+            addUserApi(user);
             userForm.reset();
         } else {
             alert('Alguno de los campos no es correcto');
@@ -181,7 +157,4 @@ document.getElementsByClassName
     });
 
     // Cargar usuarios almacenados en localStorage al cargar la página
-    usersData.forEach(user => {
-        addUserToList(user.name, user.address, user.email);
-    });
 });
