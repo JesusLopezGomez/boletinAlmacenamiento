@@ -83,8 +83,7 @@ function enviarDatos(){
         
         const user = {name,address,email};
         anniadirUsuarioApiSinDuplicados(user);
-        document.getElementById("userForm").reset();
- 
+        document.getElementById("userForm").reset(); //Si no le hago un reset al formulario no funciona
     });
 }
 
