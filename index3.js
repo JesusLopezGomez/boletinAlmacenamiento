@@ -77,14 +77,13 @@ function anniadirUsuarioApiSinDuplicados(usuario){
 
 function enviarDatos(){
     botonEnviar.addEventListener("click",function(event){
-        event.preventDefault(); //Preguntar que porque si no envío el formulario me funciona y si no no
         let name = document.getElementById("name").value;
         let address = document.getElementById("address").value;
         let email = document.getElementById("email").value;
         
         const user = {name,address,email};
         anniadirUsuarioApiSinDuplicados(user);
-        document.getElementById("userForm").reset(); //Hago un reset porque como no envío el formulario
+        document.getElementById("userForm").reset();
  
     });
 }
