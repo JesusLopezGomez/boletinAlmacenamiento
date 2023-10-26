@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded",function(){
     
     function enviarDatos(){
         botonEnviar.addEventListener("click",function(event){
+            event.preventDefault();
             let name = document.getElementById("name").value;
             let address = document.getElementById("address").value;
             let email = document.getElementById("email").value;
