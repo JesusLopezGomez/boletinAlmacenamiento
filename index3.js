@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded",function(){
     
     function anniadirUsuarioLista(usuario){
         let li = document.createElement("LI");
-        li.appendChild(document.createTextNode(`${usuario.name}:${usuario.address}:${usuario.email}:${usuario.tlf}:${new Date(usuario.dateOfBirth).to}:`));
+        li.appendChild(document.createTextNode(`${usuario.name}:${usuario.address}:${usuario.email}:${usuario.tlf}:${new Date(usuario.dateOfBirth).toLocaleDateString()}:`));
     
         let botonBorrar = document.createElement("BUTTON");
         botonBorrar.textContent = "Borrar";
