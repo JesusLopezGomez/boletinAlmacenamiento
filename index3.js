@@ -160,11 +160,29 @@ document.addEventListener("DOMContentLoaded",function(){
     
     function modificar(usuario){
         document.getElementById("editar").addEventListener("click",function(){
-            usuario.name = document.getElementById("name").value;
-            usuario.address = document.getElementById("address").value;
-            usuario.email = document.getElementById("email").value;
+            let name = document.getElementById("name").value;
+            let address = document.getElementById("address").value;
+            let email = document.getElementById("email").value;
+            let tlf = document.getElementById("tlf").value;
+            let dateOfBirth = document.getElementById("dateOfBirth").value;
             
-            cambiarUsuarioApi(usuario.id,usuario);
+            if(name && address && email && tlf && dateOfBirth){ 
+                if(validateEmail(email) && esMayorEdad(dateOfBirth) && validateNum(tlf)){
+                    usuario.name = name;
+                    usuario.address = address;
+                    usuario.email = email;
+                    usuario.tlf = tlf;
+                    usuario.dateOfBirth = dateOfBirth;
+                    cambiarUsuarioApi(usuario.id,usuario); 
+                }else if(!validateEmail(email)){
+                    alert("El email introducido no es válido");
+                }else if(!esMayorEdad(dateOfBirth)){
+                    alert("La fecha de nacimiento introducida no es válido");
+                }else if(!validateNum(tlf)){
+                    alert("El telefono introducido no es válido");
+                }
+            }
+
         })
     }
 
