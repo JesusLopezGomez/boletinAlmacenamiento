@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded",function(){
             let email = document.getElementById("email").value;
             let tlf = document.getElementById("tlf").value;
             let dateOfBirth = document.getElementById("dateOfBirth").value;
+            
             if(name && address && email && tlf && dateOfBirth){ 
                 if(validateEmail(email) && esMayorEdad(dateOfBirth) && validateNum(tlf)){
                     const user = {name,address,email,tlf,dateOfBirth};
@@ -165,7 +166,7 @@ document.addEventListener("DOMContentLoaded",function(){
             let email = document.getElementById("email").value;
             let tlf = document.getElementById("tlf").value;
             let dateOfBirth = document.getElementById("dateOfBirth").value;
-            
+
             if(name && address && email && tlf && dateOfBirth){ 
                 if(validateEmail(email) && esMayorEdad(dateOfBirth) && validateNum(tlf)){
                     usuario.name = name;
