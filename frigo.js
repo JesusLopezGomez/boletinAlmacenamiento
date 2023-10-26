@@ -9,31 +9,35 @@ const listaApi = "http://localhost:3000/lista";
 
 let arrayFrigo = [];
 let arrayLista = [];
-/*------ Metodos con API ------*/
 
 function anniadirProductoApiConCantidad(producto, api){
     const xhr = new XMLHttpRequest();
     xhr.open("GET",api+"?nombre="+producto.nombre);
-    
+    xhr.send();
     xhr.addEventListener("load",function(){
         if(xhr.status == 200){
-            if(api === "http://localhost:3000/frigo"){
-                if(JSON.parse(xhr.responseText).length > 0){
-                    producto.cantidad = parseInt(JSON.parse(xhr.responseText)[JSON.parse(xhr.responseText).length-1].cantidad)+1;
-                }
-                anniadirProductoApi(producto,api);
+            if(JSON.parse(xhr.responseText).length > 0){
+                sumarCantidadProducto(JSON.parse(xhr.responseText)[0],api);
             }else{
-                if(JSON.parse(xhr.responseText).length > 0){
-                    producto.cantidad += 1;
-                }
                 anniadirProductoApi(producto,api);
             }
         }
     })
-
-    xhr.send();
 }
 
+function sumarCantidadProducto(producto){
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT",frigoApi + "/" +producto.id);
+    xhr.setRequestHeader("Content-type","application/json");
+    const body = {nombre : producto.nombre, cantidad: producto.cantidad +1}
+    xhr.addEventListener("load",function(){
+        if(xhr.status == 200){
+            console.log("Éxito");
+            document.reload();
+        }
+    });
+    xhr.send(JSON.stringify(body));
+}
 function anniadirProductoApi(producto,api){
     const xhr = new XMLHttpRequest();
     xhr.open("POST",api);
@@ -84,10 +88,8 @@ function borrarProductoApi(id,api){
 }
 
 
-/*------ Fin de metodos con API ------*/
 function enviarListaFrigo(){
     enviarFrigo.addEventListener("click",function(event){
-        //event.preventDefault();
         let producto = document.getElementById("productoFrigo").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto,cantidad:1},frigoApi);
@@ -97,7 +99,6 @@ function enviarListaFrigo(){
 
 function enviarListaCompra(){
     enviarLista.addEventListener("click",function(event){
-        //event.preventDefault();
         let producto = document.getElementById("productoLista").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto},listaApi);
@@ -127,7 +128,7 @@ function anniadirLista(producto){
     listaCompra.appendChild(li);
 }
 
-function borrarProductoFrigo(){
+function borrar(){
     listaFrigo.addEventListener("click",function(event){
         if(event.target.classList.contains("delFrigo")){
             let li = event.target.parentElement;
@@ -138,9 +139,7 @@ function borrarProductoFrigo(){
             anniadirProductoApi({nombre},listaApi)
         }
     })
-}
 
-function borrarProductoLista(){
     listaCompra.addEventListener("click",function(event){
         if(event.target.classList.contains("delLista")){
             let li = event.target.parentElement;
@@ -155,5 +154,4 @@ enviarListaFrigo();
 enviarListaCompra();
 cargarInfosApi(listaApi);
 cargarInfosApi(frigoApi);
-borrarProductoFrigo();
-borrarProductoLista();
+borrar();
