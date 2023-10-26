@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded",function(){
     
     function getUsuariosApi(){
         const peticion = new XMLHttpRequest();
-        peticion.open("GET",url);
+        peticion.open("GET",url + "?_sort=name&_order=asc");
         peticion.setRequestHeader("Accept","application/json");
     
         peticion.addEventListener("load",function(){
@@ -81,16 +81,27 @@ document.addEventListener("DOMContentLoaded",function(){
             let name = document.getElementById("name").value;
             let address = document.getElementById("address").value;
             let email = document.getElementById("email").value;
-            
-            const user = {name,address,email};
-            anniadirUsuarioApiSinDuplicados(user);
-            document.getElementById("userForm").reset(); //Si no le hago un reset al formulario no funciona
+            let tlf = document.getElementById("tlf").value;
+            let dateOfBirth = document.getElementById("dateOfBirth").value;
+            if(name && address && email && tlf && dateOfBirth){ 
+                if(validateEmail(email) && esMayorEdad(dateOfBirth) && validateNum(tlf)){
+                    const user = {name,address,email,tlf,dateOfBirth};
+                    anniadirUsuarioApiSinDuplicados(user);    
+                }else if(!validateEmail(email)){
+                    alert("El email introducido no es válido");
+                }else if(!esMayorEdad(dateOfBirth)){
+                    alert("La fecha de nacimiento introducida no es válido");
+                }else if(!validateNum(tlf)){
+                    alert("El telefono introducido no es válido");
+                }
+            }
+
         });
     }
     
     function anniadirUsuarioLista(usuario){
         let li = document.createElement("LI");
-        li.appendChild(document.createTextNode(`${usuario.name}:${usuario.address}:${usuario.email}:`));
+        li.appendChild(document.createTextNode(`${usuario.name}:${usuario.address}:${usuario.email}:${usuario.tlf}:${new Date(usuario.dateOfBirth).to}:`));
     
         let botonBorrar = document.createElement("BUTTON");
         botonBorrar.textContent = "Borrar";
@@ -128,13 +139,16 @@ document.addEventListener("DOMContentLoaded",function(){
                         document.getElementById("name").value = usuario.name;
                         document.getElementById("address").value = usuario.address;
                         document.getElementById("email").value = usuario.email;
-    
+                        document.getElementById("tlf").value = usuario.tlf;
+                        document.getElementById("dateOfBirth").value = usuario.dateOfBirth;
                         botonEnviar.setAttribute("disabled","true");
             
                         let editar = document.createElement("BUTTON");
                         editar.setAttribute("id","editar");
                         editar.textContent = "Editar usuario";
-                        document.getElementById("userForm").appendChild(editar);
+                        if(document.querySelectorAll("#editar").length < 1){
+                            document.getElementById("userForm").appendChild(editar);
+                        }
                         modificar(usuario);
                     }
                 })
@@ -153,10 +167,25 @@ document.addEventListener("DOMContentLoaded",function(){
             cambiarUsuarioApi(usuario.id,usuario);
         })
     }
+
+    function esMayorEdad(date){
+        return new Date(Date.now()).getFullYear() - new Date(date).getFullYear() >= 18;
+    }
+
+    function validateEmail(email) {
+        const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return regex.test(email);
+    }
+    
+    function validateNum(num){
+        const regex = /[0-9]{9}$/;
+        return regex.test(num);
+    }
     
     enviarDatos();
     mostrarDatosEditar();
     getUsuariosApi();
     borrar();
+
 });
 
