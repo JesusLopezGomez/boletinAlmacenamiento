@@ -32,8 +32,7 @@ function sumarCantidadProducto(producto){
     const body = {nombre : producto.nombre, cantidad: producto.cantidad +1}
     xhr.addEventListener("load",function(){
         if(xhr.status == 200){
-            console.log("Éxito");
-            document.reload();
+            location.reload();
         }
     });
     xhr.send(JSON.stringify(body));
@@ -90,6 +89,7 @@ function borrarProductoApi(id,api){
 
 function enviarListaFrigo(){
     enviarFrigo.addEventListener("click",function(event){
+        event.preventDefault();
         let producto = document.getElementById("productoFrigo").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto,cantidad:1},frigoApi);
@@ -99,6 +99,7 @@ function enviarListaFrigo(){
 
 function enviarListaCompra(){
     enviarLista.addEventListener("click",function(event){
+        event.preventDefault();
         let producto = document.getElementById("productoLista").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto},listaApi);

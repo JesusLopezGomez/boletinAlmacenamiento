@@ -1,0 +1,25 @@
+{
+  "shoplist": [],
+  "fridge": [
+    {
+      "name": "a",
+      "cant": 6,
+      "id": 1
+    },
+    {
+      "name": "ee",
+      "cant": 1,
+      "id": 2
+    },
+    {
+      "name": "i",
+      "cant": 2,
+      "id": 3
+    }
+  ],
+  "lista": [],
+  "frigo": [{
+  "nombre": "i",
+  "cantidad": 2,
+  "id": 3}]
+}
