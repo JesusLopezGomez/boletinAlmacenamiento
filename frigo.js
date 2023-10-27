@@ -89,7 +89,7 @@ function borrarProductoApi(id,api){
 
 function enviarListaFrigo(){
     enviarFrigo.addEventListener("click",function(event){
-        event.preventDefault();
+        //event.preventDefault();
         let producto = document.getElementById("productoFrigo").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto,cantidad:1},frigoApi);
@@ -99,7 +99,7 @@ function enviarListaFrigo(){
 
 function enviarListaCompra(){
     enviarLista.addEventListener("click",function(event){
-        event.preventDefault();
+        //event.preventDefault();
         let producto = document.getElementById("productoLista").value;
         if(producto){
             anniadirProductoApiConCantidad({nombre:producto},listaApi);

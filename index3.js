@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded",function(){
                     alert("El telefono introducido no es válido");
                 }
             }
-
+            document.getElementById("userForm").reset();
         });
     }
     
